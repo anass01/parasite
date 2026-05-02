@@ -34,7 +34,7 @@ interface Props {
 
 export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<any>();
+  const graphRef = useRef<any>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [hoverNode, setHoverNode] = useState<Node | null>(null);
   
@@ -104,7 +104,7 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
     }
   }, [data]);
 
-  const handleNodeClick = useCallback((node: Node) => {
+  const handleNodeClick = useCallback((node: any) => {
     onNodeSelect(node);
   }, [onNodeSelect]);
 
@@ -112,11 +112,11 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
     onNodeSelect(null);
   }, [onNodeSelect]);
 
-  const handleNodeHover = useCallback((node: Node | null) => {
+  const handleNodeHover = useCallback((node: any) => {
     setHoverNode(node);
   }, []);
 
-  const paintNode = useCallback((node: Node, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const r = node.val;
     const isSelected = selectedNode?.id === node.id;
     const isHovered = hoverNode?.id === node.id;
