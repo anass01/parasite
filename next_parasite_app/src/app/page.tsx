@@ -43,51 +43,49 @@ export default function Home() {
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-[var(--bg-dark)]">
       {/* Top Navigation Bar */}
-      <header className="shrink-0 h-[56px] glass-panel-light flex items-center px-6 justify-between z-40 relative">
+      <header className="shrink-0 h-[var(--nav-height)] glass-header flex items-center justify-between px-8 z-40 relative">
         {/* Left Section: Brand & Search */}
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveView('graph')}>
-            <div className="shrink-0 w-6 h-6 bg-[var(--accent-olive)] flex items-center justify-center" style={{ borderRadius: '2px' }}>
-              <Database size={14} className="text-black" />
+        <div className="flex-1 flex items-center gap-8">
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveView('graph')}>
+            <div className="intel-border shrink-0 w-7 h-7 flex items-center justify-center transition-all group-hover:bg-[var(--accent-olive)] group-hover:border-transparent">
+              <Database size={14} className="text-[var(--accent-olive)] group-hover:text-black transition-colors" />
             </div>
-            <div className="text-sm font-bold tracking-widest flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
-              PARASITE <span className="font-normal text-xs opacity-30">v0.0.38</span>
+            <div className="text-sm font-bold tracking-[0.25em] flex items-center gap-2 intel-text" style={{ color: 'var(--text-main)' }}>
+              PARASITE <span className="font-medium text-[9px] opacity-20 mono">V0.0.38</span>
             </div>
           </div>
 
           <div className="relative group">
-            <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5" style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-              <SearchIcon size={14} style={{ color: 'var(--text-dim)' }} />
+            <div className="intel-search-container px-4 py-2 flex items-center gap-6 transition-all group-focus-within:border-[var(--accent-olive)]/40">
+              <SearchIcon size={12} className="text-[var(--text-dim)] group-focus-within:text-[var(--accent-olive)] transition-colors" />
               <input
                 type="text"
-                placeholder="Search intelligence..."
-                className="bg-transparent border-none outline-none text-xs w-[280px] text-white"
+                placeholder="SEARCH"
+                className="bg-transparent border-none outline-none text-[10px] w-[200px] text-white placeholder:text-white/10 mono uppercase tracking-widest"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <div className="flex items-center gap-1 px-1 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] text-white/30">
-                <Command size={8} /> K
-              </div>
+
             </div>
 
             {filteredNodes.length > 0 && (
-              <div className="absolute top-full left-0 w-full glass-panel p-1 z-50 animate-fade-in" style={{ marginTop: '8px', borderRadius: '4px' }}>
+              <div className="absolute top-full left-0 w-full glass-panel p-2 z-50 animate-fade-in intel-border" style={{ marginTop: '12px' }}>
+                <div className="px-3 py-1.5 text-[8px] font-bold tracking-[0.3em] text-[var(--accent-olive)] uppercase border-b border-white/5 mb-1">SEARCH_RESULTS</div>
                 {filteredNodes.map((node: any) => (
                   <div
                     key={node.id}
-                    className="p-2 text-xs text-white cursor-pointer flex items-center justify-between hover-olive"
+                    className="p-2 text-[10px] text-white cursor-pointer flex items-center justify-between hover-olive mb-0.5 mono"
                     onClick={() => {
                       setSelectedNode(node);
                       setSearchQuery("");
                       setActiveView('graph');
                     }}
-                    style={{ borderRadius: '4px' }}
                   >
-                    <div className="flex items-center gap-2">
-                      <span>{node.icon}</span>
-                      <span>{node.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs opacity-50">{node.icon}</span>
+                      <span className="font-bold tracking-widest">{node.name}</span>
                     </div>
-                    <span className="opacity-30 uppercase" style={{ fontSize: '9px' }}>{node.type}</span>
+                    <span className="opacity-30 uppercase text-[8px]">{node.type}</span>
                   </div>
                 ))}
               </div>
@@ -95,33 +93,41 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Center Section (Nav) */}
-        <nav className="flex h-full items-center text-xs font-bold tracking-widest" style={{ color: 'var(--text-dim)' }}>
-          <NavItem
-            icon={<LayoutGrid size={12} />}
-            label="GRAPH"
-            active={activeView === 'graph'}
-            onClick={() => setActiveView('graph')}
-          />
-          <NavItem
-            icon={<Trophy size={12} />}
-            label="LEADERBOARD"
-            active={activeView === 'leaderboard'}
-            onClick={() => setActiveView('leaderboard')}
-          />
-        </nav>
+        {/* Center Section: Navigation (Military Style) */}
+        <div className="flex justify-center">
+          <nav className="nav-pill">
+            <NavItem
+              icon={<LayoutGrid size={13} />}
+              label="GRAPH"
+              active={activeView === 'graph'}
+              onClick={() => setActiveView('graph')}
+            />
+            <NavItem
+              icon={<Trophy size={13} />}
+              label="LEADERBOARD"
+              active={activeView === 'leaderboard'}
+              onClick={() => setActiveView('leaderboard')}
+            />
+          </nav>
+        </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-4">
-          <div className="flex text-xs items-center gap-2 px-3 py-1.5" style={{ color: 'var(--text-dim)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px' }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-olive)] animate-pulse" style={{ borderRadius: '50%' }}></span>
-            ONLINE
+        {/* Right Section: Status & Actions */}
+        <div className="flex-1 flex items-center justify-end gap-6 px-6" style={{ justifyContent: 'flex-end' }}>
+          <div className="intel-bracket flex text-[10px] font-bold tracking-[0.2em] items-center gap-3 py-1.5 mono">
+            <span className="w-1.5 h-1.5 bg-[var(--accent-olive)] animate-pulse-glow shadow-[0_0_8px_var(--accent-olive)]"></span>
+            <span style={{ color: 'var(--text-dim)' }}>STATUS: <span className="text-[var(--accent-olive)]">WIP</span></span>
           </div>
-          <button className="p-2 hover:text-[var(--accent-red)] transition-colors" style={{ color: 'var(--text-dim)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-            <LogOut size={16} />
+          <button
+            className="intel-border w-9 h-9 flex items-center justify-center hover:bg-[var(--accent-red)]/10 hover:border-[var(--accent-red)] transition-all group"
+            title="TERMINATE_SESSION"
+            style={{ background: 'transparent', cursor: 'pointer' }}
+          >
+            <LogOut size={16} className="text-[var(--text-dim)] group-hover:text-[var(--accent-red)] transition-colors" />
           </button>
         </div>
       </header>
+
+
 
       {/* Main Content Viewport */}
       <div className="flex-1 relative overflow-hidden flex flex-col">
@@ -166,11 +172,20 @@ export default function Home() {
 function NavItem({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
   return (
     <div
-      className={`flex items-center gap-2 px-6 h-full transition-all cursor-pointer ${active ? 'nav-active' : ''}`}
+      className={`nav-item ${active ? 'nav-item-active' : 'text-white/40'}`}
       onClick={onClick}
     >
-      {icon}
-      <span>{label}</span>
+      {active && (
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-black"></div>
+          <div className="absolute top-1 left-1 w-1 h-1 border-t border-l border-black"></div>
+        </div>
+      )}
+      <span className="shrink-0 relative z-10">{icon}</span>
+      <span className="intel-text text-[10px] font-black relative z-10">{label}</span>
+      {active && (
+        <div className="ml-2 w-1.5 h-1.5 bg-black intel-active-marker"></div>
+      )}
     </div>
   );
 }

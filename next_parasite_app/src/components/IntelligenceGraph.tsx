@@ -235,20 +235,22 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
 function GraphControl({ onClick, label }: { onClick: () => void, label: string }) {
   return (
     <button 
-      className="glass-panel-light flex items-center justify-center transition-all"
+      className="flex items-center justify-center transition-all hover:scale-110 active:scale-95"
       onClick={onClick}
       style={{ 
           pointerEvents: 'auto', 
-          width: '32px', 
-          height: '32px', 
-          borderRadius: '4px', 
-          color: 'rgba(255,255,255,0.6)', 
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.05)',
-          cursor: 'pointer'
+          width: '36px', 
+          height: '36px', 
+          borderRadius: '8px', 
+          color: 'var(--text-main)', 
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          backdropFilter: 'blur(8px)',
+          cursor: 'pointer',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
       }}
     >
-      <span style={{ fontSize: '18px', fontWeight: 300 }}>{label}</span>
+      <span style={{ fontSize: '20px', fontWeight: 300, opacity: 0.7 }}>{label}</span>
     </button>
   );
 }

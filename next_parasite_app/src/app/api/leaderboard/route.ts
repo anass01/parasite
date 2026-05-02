@@ -89,7 +89,10 @@ export async function GET() {
         const leaderboard = Array.from(leaderboardMap.entries())
             .map(([name, total]) => ({ name, total: Math.round(total * 100) / 100 }))
             .sort((a, b) => b.total - a.total)
-
+        //hide donation amount 
+        leaderboard.forEach(user => {
+            user.total = 0;
+        });
         return NextResponse.json(leaderboard);
     } catch (error: any) {
         console.error("Leaderboard API Error:", error);
