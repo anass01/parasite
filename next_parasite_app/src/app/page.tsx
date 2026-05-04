@@ -4,14 +4,35 @@ import React, { useState, useEffect, useMemo } from 'react';
 import IntelligenceGraph from '@/components/IntelligenceGraph';
 import Sidebar from '@/components/Sidebar';
 import LeaderboardView from '@/components/LeaderboardView';
-import { Search as SearchIcon, Command, Trophy, Database, LayoutGrid, LogOut } from 'lucide-react';
+import ProfilerView from '@/components/ProfilerView';
+import { Search as SearchIcon, Trophy, Database, LayoutGrid, LogOut, Brain } from 'lucide-react';
+
+interface GraphNode {
+  id: string;
+  name: string;
+  type: string;
+  icon: string;
+  color: string;
+  degree: number;
+  val: number;
+  neighborIds: string[];
+  links: { id: string; name: string; relation: string }[];
+  lastSeen?: string | null;
+  x?: number;
+  y?: number;
+}
+
+interface GraphData {
+  nodes: GraphNode[];
+  links: { source: string | GraphNode; target: string | GraphNode; relation: string }[];
+}
 
 export default function Home() {
-  const [data, setData] = useState<any>(null);
-  const [selectedNode, setSelectedNode] = useState<any>(null);
+  const [data, setData] = useState<GraphData | null>(null);
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeView, setActiveView] = useState<'graph' | 'leaderboard'>('graph');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeView, setActiveView] = useState<'graph' | 'leaderboard' | 'profiler'>('graph');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -28,10 +49,10 @@ export default function Home() {
       });
   }, []);
 
-  const filteredNodes = useMemo(() => {
+  const filteredNodes = useMemo((): GraphNode[] => {
     if (!data?.nodes || !searchQuery) return [];
     return data.nodes
-      .filter((n: any) => n.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      .filter((n) => n.name.toLowerCase().includes(searchQuery.toLowerCase()))
       .slice(0, 8);
   }, [data, searchQuery]);
 
@@ -71,13 +92,13 @@ export default function Home() {
             {filteredNodes.length > 0 && (
               <div className="absolute top-full left-0 w-full glass-panel p-2 z-50 animate-fade-in intel-border" style={{ marginTop: '12px' }}>
                 <div className="px-3 py-1.5 text-[8px] font-bold tracking-[0.3em] text-[var(--accent-olive)] uppercase border-b border-white/5 mb-1">SEARCH_RESULTS</div>
-                {filteredNodes.map((node: any) => (
+                {filteredNodes.map((node) => (
                   <div
                     key={node.id}
                     className="p-2 text-[10px] text-white cursor-pointer flex items-center justify-between hover-olive mb-0.5 mono"
                     onClick={() => {
                       setSelectedNode(node);
-                      setSearchQuery("");
+                      setSearchQuery('');
                       setActiveView('graph');
                     }}
                   >
@@ -107,6 +128,12 @@ export default function Home() {
               label="LEADERBOARD"
               active={activeView === 'leaderboard'}
               onClick={() => setActiveView('leaderboard')}
+            />
+            <NavItem
+              icon={<Brain size={13} />}
+              label="PROFILER"
+              active={activeView === 'profiler'}
+              onClick={() => setActiveView('profiler')}
             />
           </nav>
         </div>
@@ -142,16 +169,21 @@ export default function Home() {
         ) : (
           <>
             {activeView === 'graph' ? (
-              <IntelligenceGraph
-                data={data}
-                onNodeSelect={setSelectedNode}
-                selectedNode={selectedNode}
-              />
-            ) : (
+              data && (
+                <IntelligenceGraph
+                  data={data}
+                  onNodeSelect={setSelectedNode}
+                  selectedNode={selectedNode}
+                />
+              )
+            ) : activeView === 'leaderboard' ? (
               <LeaderboardView />
+            ) : (
+              <ProfilerView />
             )}
           </>
         )}
+
 
         {/* Sidebar wrapper */}
         <div

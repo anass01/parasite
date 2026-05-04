@@ -16,6 +16,7 @@ interface Node {
   color: string;
   degree: number;
   neighborIds: string[];
+  links: any[];
   x?: number;
   y?: number;
 }
@@ -104,7 +105,7 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
     }
   }, [data]);
 
-  const handleNodeClick = useCallback((node: any) => {
+  const handleNodeClick = useCallback((node: Node) => {
     onNodeSelect(node);
   }, [onNodeSelect]);
 
@@ -112,11 +113,11 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
     onNodeSelect(null);
   }, [onNodeSelect]);
 
-  const handleNodeHover = useCallback((node: any) => {
+  const handleNodeHover = useCallback((node: Node | null) => {
     setHoverNode(node);
   }, []);
 
-  const paintNode = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const paintNode = useCallback((node: Node, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const r = node.val;
     const isSelected = selectedNode?.id === node.id;
     const isHovered = hoverNode?.id === node.id;
@@ -204,9 +205,9 @@ export default function IntelligenceGraph({ data, onNodeSelect, selectedNode }: 
           linkDirectionalParticles={link => highlightLinks.has(link as Link) ? 3 : 0}
           linkDirectionalParticleWidth={2}
           linkDirectionalParticleSpeed={0.005}
-          nodeCanvasObject={paintNode}
-          onNodeClick={handleNodeClick}
-          onNodeHover={handleNodeHover}
+          nodeCanvasObject={paintNode as any}
+          onNodeClick={handleNodeClick as any}
+          onNodeHover={handleNodeHover as any}
           onBackgroundClick={handleBackgroundClick}
           cooldownTicks={150}
           d3VelocityDecay={0.4}

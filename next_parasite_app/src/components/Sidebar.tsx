@@ -8,7 +8,9 @@ interface Node {
   icon: string;
   color: string;
   degree: number;
-  links: any[];
+  val: number;
+  neighborIds: string[];
+  links: { id: string; name: string; relation: string }[];
   lastSeen?: string | null;
 }
 

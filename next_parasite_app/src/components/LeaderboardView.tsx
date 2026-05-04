@@ -84,7 +84,7 @@ export default function LeaderboardView() {
                 <div className="text-right">
                   <div className="flex items-center gap-2 justify-end text-[var(--accent-olive)] font-bold text-3xl mono tracking-tighter">
                     <DollarSign size={24} className="opacity-50" />
-                    <span suppressHydrationWarning>{donator.total.toLocaleString() && false || "CLASSIFIED"}</span>
+                    <span>CLASSIFIED</span>
                   </div>
                   <div className="text-[10px] tracking-[0.2em] text-[var(--text-dim)] uppercase font-bold mt-1.5">Contribution Index (USD)</div>
                 </div>
