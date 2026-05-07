@@ -12,17 +12,17 @@ interface DonationRow {
 // Defined once at module level — not recreated on every request
 const CONVERSION_RATES: Record<string, number> = {
     'USD': 1.0, '$': 1.0,
-    '£': 1.27, 'GBP': 1.27,
-    '€': 1.08, 'EUR': 1.08,
-    'MAD': 0.10, 'AED': 0.27,
-    'CA$': 0.73, 'CAD': 0.73,
-    'CHF': 1.10, 'PLN': 0.25,
-    'SAR': 0.27, 'IDR': 0.000062,
-    'NZ$': 0.60, 'NZD': 0.60,
-    'ZAR': 0.054,
-    'A$': 0.66, 'AUD': 0.66,
-    'MX$': 0.059, 'MXN': 0.059,
-    'R$': 0.19, 'BRL': 0.19,
+    '£': 1.33, 'GBP': 1.33,
+    '€': 1.17, 'EUR': 1.17,
+    'MAD': 0.11, 'AED': 0.27,
+    'CA$': 0.74, 'CAD': 0.74,
+    'CHF': 1.10, 'PLN': 0.28,
+    'SAR': 0.27, 'IDR': 0.000057,
+    'NZ$': 0.59, 'NZD': 0.59,
+    'ZAR': 0.060,
+    'A$': 0.72, 'AUD': 0.72,
+    'MX$': 0.058, 'MXN': 0.058,
+    'R$': 0.20, 'BRL': 0.20,
     '¥': 0.0064, 'JP¥': 0.0064,
 };
 

@@ -77,38 +77,40 @@ export default function Home() {
           </div>
 
           <div className="relative group">
-            <div className="intel-search-container px-4 py-2 flex items-center gap-6 transition-all group-focus-within:border-[var(--accent-olive)]/40">
+            <div className="intel-search-container h-9 flex items-center gap-3 px-4 transition-all">
+              <span className="intel-search-label">INTEL_QUERY</span>
               <SearchIcon size={12} className="text-[var(--text-dim)] group-focus-within:text-[var(--accent-olive)] transition-colors" />
               <input
                 type="text"
-                placeholder="SEARCH"
-                className="bg-transparent border-none outline-none text-[10px] w-[200px] text-white placeholder:text-white/10 mono uppercase tracking-widest"
+                placeholder="SEARCH_ENTITIES..."
+                className="bg-transparent border-none outline-none text-[10px] w-[220px] text-white placeholder:text-white/20 mono uppercase tracking-widest"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-
             </div>
 
             {filteredNodes.length > 0 && (
-              <div className="absolute top-full left-0 w-full glass-panel p-2 z-50 animate-fade-in intel-border" style={{ marginTop: '12px' }}>
-                <div className="px-3 py-1.5 text-[8px] font-bold tracking-[0.3em] text-[var(--accent-olive)] uppercase border-b border-white/5 mb-1">SEARCH_RESULTS</div>
-                {filteredNodes.map((node) => (
-                  <div
-                    key={node.id}
-                    className="p-2 text-[10px] text-white cursor-pointer flex items-center justify-between hover-olive mb-0.5 mono"
-                    onClick={() => {
-                      setSelectedNode(node);
-                      setSearchQuery('');
-                      setActiveView('graph');
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs opacity-50">{node.icon}</span>
-                      <span className="font-bold tracking-widest">{node.name}</span>
+              <div className="absolute top-full left-0 right-0 z-50 pt-3">
+                <div className="glass-panel p-2 animate-fade-in intel-border">
+                  <div className="px-3 py-1.5 text-[8px] font-bold tracking-[0.3em] text-[var(--accent-olive)] uppercase border-b border-white/5 mb-1">SEARCH_RESULTS</div>
+                  {filteredNodes.map((node) => (
+                    <div
+                      key={node.id}
+                      className="p-2 text-[10px] text-white cursor-pointer flex items-center justify-between hover-olive mb-0.5 mono"
+                      onClick={() => {
+                        setSelectedNode(node);
+                        setSearchQuery('');
+                        setActiveView('graph');
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs opacity-50">{node.icon}</span>
+                        <span className="font-bold tracking-widest">{node.name}</span>
+                      </div>
+                      <span className="opacity-30 uppercase text-[8px]">{node.type}</span>
                     </div>
-                    <span className="opacity-30 uppercase text-[8px]">{node.type}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>
