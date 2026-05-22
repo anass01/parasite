@@ -8,11 +8,13 @@ let connectionString = process.env.POSTGRES_URL;
 if (connectionString) {
     try {
         const url = new URL(connectionString);
+        url.pathname = '/parasite'; // Force 'parasite' database
         url.searchParams.delete('sslmode');
         connectionString = url.toString();
     } catch (e) {
         // Fallback if URL parsing fails
         connectionString = connectionString
+            .replace(/\/postgres(\?|$)/, '/parasite$1') // Force 'parasite' database
             .replace(/sslmode=[^&]+/g, '')
             .replace(/\?&/g, '?')
             .replace(/&&/g, '&')
