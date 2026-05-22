@@ -33,13 +33,12 @@ export default function ProfilerView() {
                     setError(data.error);
                     setUsers([]);
                 } else {
-                    console.error("API did not return an array:", data);
+                    setError('Unexpected response from server.');
                     setUsers([]);
                 }
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Failed to load users:", err);
                 setError(err.message);
                 setUsers([]);
                 setLoading(false);
@@ -70,7 +69,6 @@ export default function ProfilerView() {
             }
         } catch (err) {
             setInsights("Failed to generate insights.");
-            console.error(err);
         } finally {
             setGenerating(false);
         }

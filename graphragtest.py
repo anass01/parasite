@@ -1,39 +1,45 @@
-import duckdb
+import psycopg2
 import json
 from openai import OpenAI
 import networkx as nx
-
 import sys
+from config import POSTGRES_CONN_STRING
 
 # Connect to your local LM Studio instance
 sys.stdout.reconfigure(encoding='utf-8')
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
-con = duckdb.connect('./db/chat.duckdb')
+
+conn = psycopg2.connect(POSTGRES_CONN_STRING)
+con = conn.cursor()
 
 # 1. Fetch a batch of messages
-messages = con.execute("SELECT author_name, message FROM chat_messages LIMIT 1000").fetchall()
+con.execute("SELECT author_name, message FROM chat_messages LIMIT 1000")
+messages = con.fetchall()
 chat_text = "\n".join([f"{row[0]}: {row[1]}" for row in messages])
 
 # 2. Ask the LLM to extract relationships
+import os
+KNOWLEDGE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge.md")
+KNOWLEDGE = ""
+if os.path.exists(KNOWLEDGE_PATH):
+    try:
+        with open(KNOWLEDGE_PATH, "r", encoding="utf-8") as f:
+            KNOWLEDGE = f.read().strip()
+    except Exception as e:
+        print(f"⚠️ Warning: Could not read {KNOWLEDGE_PATH}: {e}")
+else:
+    print(f"⚠️ Warning: {KNOWLEDGE_PATH} not found.")
+
 prompt = f"""
 You are an expert Data Scientist extracting Knowledge Graph triplets from a livestream chat. 
 The chat contains a mix of English, Moroccan Darija, and other languages.
 
 Your task is to extract relationships and output them STRICTLY as a JSON array of objects. 
 
-KNOWLEGDE:
-    comunity is for people who want to be rich
-    zouhir is the host of the stream
-    parasite is someone who works online but not super profesional 
-    dragonball is a succesfull parasite
-    yajoura means brick used in this commnity to describe consistency and hard work (brick by brick)
-    mauritania is used as a alias when they want to talk about morocco
-    dela7 means watermelon and is used as a synonym for women in multiple ways not derogatory
-    subhuman means someone who doesnt make money or isnt a channel member
-    labubu means burnout in this comunity
-    HMH is a greeting used in this comunity (health money heaven)
-    
-    
+KNOWLEDGE BASE:
+{KNOWLEDGE}
+
+
 CRITICAL RULES:
 1. NORMALIZE TO ENGLISH: Translate all underlying topics and actions into English. If someone speaks in Darija, extract the meaning and write the JSON in English to maintain graph consistency.
 2. STRICT ONTOLOGY: The "relation" key MUST be exactly one of the following uppercase terms: 
@@ -110,3 +116,6 @@ for comm_id, nodes in communities.items():
         messages=[{"role": "user", "content": summary_prompt}]
     )
     print(f"Community {comm_id} Summary: {summary_response.choices[0].message.content}")
+
+con.close()
+conn.close()

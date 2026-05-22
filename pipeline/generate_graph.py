@@ -14,6 +14,7 @@ Tables managed by this script
 """
 
 import json
+import os
 import sys
 import time
 
@@ -36,18 +37,16 @@ sys.stdout.reconfigure(encoding="utf-8")
 # ---------------------------------------------------------------------------
 # Community knowledge context (fed to the LLM)
 # ---------------------------------------------------------------------------
-KNOWLEDGE = """
-community is for people who want to be rich
-zouhir is the host of the stream
-parasite is someone who works online but not super professional
-dragonball is a successful parasite
-yajoura means brick used in this community to describe consistency and hard work (brick by brick)
-mauritania is used as an alias when they want to talk about morocco
-dela7 means watermelon and is used as a synonym for women in multiple ways not derogatory
-subhuman means someone who doesn't make money or isn't a channel member
-labubu means burnout in this community
-HMH is a greeting used in this community (health money heaven)
-"""
+KNOWLEDGE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "knowledge.md")
+KNOWLEDGE = ""
+if os.path.exists(KNOWLEDGE_PATH):
+    try:
+        with open(KNOWLEDGE_PATH, "r", encoding="utf-8") as f:
+            KNOWLEDGE = f.read().strip()
+    except Exception as e:
+        print(f"⚠️ Warning: Could not read {KNOWLEDGE_PATH}: {e}")
+else:
+    print(f"⚠️ Warning: {KNOWLEDGE_PATH} not found.")
 
 SYSTEM_PROMPT = f"""
 You are an expert Data Scientist extracting Knowledge Graph triplets from a livestream chat.
@@ -241,7 +240,6 @@ def main() -> None:
 
     print(f"\n✅ Processing complete.")
     print(f"   ~{node_count:,} unique nodes | {edge_count:,} edges in extracted_triplets")
-    print("💡 Run visualize_graph.py (in the root folder) to regenerate the HTML graph.")
 
 
 if __name__ == "__main__":

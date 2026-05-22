@@ -21,8 +21,7 @@ export default function LeaderboardView() {
         setData(d);
         setLoading(false);
       })
-      .catch(err => {
-        console.error("Failed to load leaderboard:", err);
+      .catch(() => {
         setLoading(false);
       });
   }, []);

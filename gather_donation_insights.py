@@ -1,27 +1,28 @@
 import os
 import json
-import duckdb
+import psycopg2
 import urllib.request
 import urllib.error
 
-DB_PATH = os.path.join("db", "chat.duckdb")
+from config import POSTGRES_CONN_STRING
+
 REPORT_DIR = os.path.join("reports", "user_profiles")
 MAX_MESSAGE_CHARS = 300000  # Safe character limit to stay under LM Studio token limit
 
 def gather_top_donators():
-    print(f"Connecting to DuckDB at: {DB_PATH}")
-    if not os.path.exists(DB_PATH):
-        print(f"Error: Database not found at {DB_PATH}")
+    print(f"Connecting to PostgreSQL database...")
+    try:
+        conn = psycopg2.connect(POSTGRES_CONN_STRING)
+    except Exception as e:
+        print(f"Error: Could not connect to PostgreSQL database: {e}")
         return None
 
-    con = duckdb.connect(DB_PATH, read_only=True)
-    
     query = """
     WITH donators AS (
         SELECT 
             author_name,
             COUNT(message_id) AS total_donations_count,
-            GROUP_CONCAT(purchase_amount ORDER BY timestamp DESC) AS donation_history
+            string_agg(purchase_amount, ',' ORDER BY timestamp DESC) AS donation_history
         FROM 
             chat_messages
         WHERE 
@@ -29,14 +30,16 @@ def gather_top_donators():
         GROUP BY 
             author_name
         ORDER BY
-        total_donations_count DESC
+            total_donations_count DESC
     )
     SELECT author_name, total_donations_count, donation_history FROM donators LIMIT 10
     """
     
     try:
-        print("Fetching top 10 donators...")
-        result = con.execute(query).fetchall()
+        print("Fetching top 10 donators from PostgreSQL...")
+        with conn.cursor() as cur:
+            cur.execute(query)
+            result = cur.fetchall()
         donators = []
         for row in result:
             donators.append({
@@ -49,18 +52,24 @@ def gather_top_donators():
         print(f"Query failed: {e}")
         return None
     finally:
-        con.close()
+        conn.close()
 
 def fetch_user_messages(author_name):
-    con = duckdb.connect(DB_PATH, read_only=True)
+    try:
+        conn = psycopg2.connect(POSTGRES_CONN_STRING)
+    except Exception as e:
+        print(f"Failed to connect to database: {e}")
+        return []
     query = """
     SELECT timestamp, message, purchase_amount 
     FROM chat_messages 
-    WHERE author_name = ? 
+    WHERE author_name = %s 
     ORDER BY timestamp ASC
     """
     try:
-        result = con.execute(query, [author_name]).fetchall()
+        with conn.cursor() as cur:
+            cur.execute(query, [author_name])
+            result = cur.fetchall()
         messages = []
         for row in result:
             timestamp = row[0]
@@ -77,7 +86,7 @@ def fetch_user_messages(author_name):
         print(f"Failed to fetch messages for {author_name}: {e}")
         return []
     finally:
-        con.close()
+        conn.close()
 
 def generate_user_report(author_name, donations_count, donation_history, messages):
     print(f"Contacting LM Studio for {author_name}...")
@@ -90,7 +99,7 @@ def generate_user_report(author_name, donations_count, donation_history, message
         
         for i, m in enumerate(messages):
             # Simple deduplication: same text and same amount
-            msg_key = (m['text'].strip(), m['amount'])
+            msg_key = (m['text'].strip() if m['text'] else "", m['amount'])
             
             if last_msg and msg_key == last_msg:
                 count += 1

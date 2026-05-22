@@ -27,7 +27,8 @@ POSTGRES_CONN_STRING: str = os.getenv(
 # Source data
 # ---------------------------------------------------------------------------
 # Directory that holds the YouTube live-chat JSON files.
-CHAT_DIR: str = r"F:\projects\parasite\chat"
+# Override with the CHAT_DIR environment variable or edit the fallback below.
+CHAT_DIR: str = os.getenv("CHAT_DIR", "./chat")
 
 # ---------------------------------------------------------------------------
 # LLM / graph settings
@@ -37,7 +38,3 @@ LLM_MODEL: str = "google/gemma-4-e2b"
 
 # Number of chat messages sent to the LLM in a single prompt.
 BATCH_SIZE: int = 200
-
-# Output paths for the generated graph artefacts.
-GRAPHML_PATH: str = "../graph_map.graphml"
-OUTPUT_HTML: str  = "../graph_map.html"

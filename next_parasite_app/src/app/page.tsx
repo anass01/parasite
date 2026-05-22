@@ -43,8 +43,7 @@ export default function Home() {
         setData(d);
         setLoading(false);
       })
-      .catch(err => {
-        console.error("Failed to load graph data:", err);
+      .catch(() => {
         setLoading(false);
       });
   }, []);

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { query, pool } from '@/lib/db';
 import { cacheGet, cacheSet } from '@/lib/cache';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
 
 const LLM_BASE_URL = 'http://localhost:1234/v1';
 const LLM_MODEL    = 'google/gemma-4-e2b';
@@ -24,21 +26,12 @@ async function ensureInsightsTable() {
     cacheSet(DB_INIT_DONE_KEY, true, 60 * 60 * 1000); // remember for 1h
 }
 
-const SYSTEM_PROMPT = `
+const BASE_SYSTEM_PROMPT = `
 You are a highly advanced profiler and psychologist for a digital community.
 Your goal is to provide deep insights about a user based on their chat history and extracted knowledge graph relations.
 
 KNOWLEDGE CONTEXT FOR THE COMMUNITY:
-- community is for people who want to be rich
-- zouhir is the host of the stream
-- parasite is someone who works online but not super professional
-- dragonball is a successful parasite
-- yajoura means brick used in this community to describe consistency and hard work (brick by brick)
-- mauritania is used as an alias when they want to talk about morocco
-- dela7 means watermelon and is used as a synonym for women in multiple ways not derogatory
-- subhuman means someone who doesn't make money or isn't a channel member
-- labubu means burnout in this community
-- HMH is a greeting used in this community (health money heaven)
+{KNOWLEDGE}
 
 Provide a comprehensive analysis including:
 1. PERSONALITY & VIBE: What is their general attitude? Are they helpful, toxic, ambitious, or just a lurker?
@@ -104,12 +97,24 @@ export async function POST(request: Request) {
                 .map(t => `${t.subject} ${t.relation} ${t.object}`)
                 .join('\n');
 
+            // Read knowledge.md dynamically
+            let knowledge = '';
+            try {
+                const knowledgePath = path.join(process.cwd(), '..', 'knowledge.md');
+                if (fs.existsSync(knowledgePath)) {
+                    knowledge = fs.readFileSync(knowledgePath, 'utf-8').trim();
+                }
+            } catch (error) {
+                console.error('Warning: Could not read knowledge.md in Next.js app:', error);
+            }
+            const systemPrompt = BASE_SYSTEM_PROMPT.replace('{KNOWLEDGE}', knowledge);
+
             // 4. Call LM Studio
             const client = new OpenAI({ baseURL: LLM_BASE_URL, apiKey: 'not-needed' });
             const response = await client.chat.completions.create({
                 model: LLM_MODEL,
                 messages: [
-                    { role: 'system', content: `${SYSTEM_PROMPT}\n\nUSER PROFILE TO ANALYZE: ${userName}` },
+                    { role: 'system', content: `${systemPrompt}\n\nUSER PROFILE TO ANALYZE: ${userName}` },
                     { role: 'user', content: `### EXTRACTED RELATIONS:\n${tripletContext}\n\n### CHAT LOGS:\n${messageContext}` },
                 ],
                 temperature: 0.7,

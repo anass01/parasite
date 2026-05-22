@@ -1,0 +1,58 @@
+# ===========================================================================
+# Parasite — Root .gitignore
+# ===========================================================================
+
+# ── Environment / Secrets ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Local Database Files ─────────────────────────────────────────────────────
+db/
+*.duckdb
+*.duckdb.wal
+*.db
+
+# ── Generated Visualisation Artefacts ────────────────────────────────────────
+# These can be gigabytes; regenerate with generate_graph_map.py
+graph_map.html
+graph_map.graphml
+
+# ── Debug / Scratch / Temp ───────────────────────────────────────────────────
+debug_names.py
+debug_names.txt
+authors_sample.txt
+scratch/
+tmp/
+reports/
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# ── Node / Next.js (sub-project has its own .gitignore) ─────────────────────
+next_parasite_app/node_modules/
+next_parasite_app/.next/
+next_parasite_app/out/
+next_parasite_app/build/
+next_parasite_app/scratch/
+next_parasite_app/.env
+next_parasite_app/.env.*
+!next_parasite_app/.env.example
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
