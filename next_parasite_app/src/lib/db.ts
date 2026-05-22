@@ -3,10 +3,27 @@ import { Pool } from 'pg';
 // Global singleton to prevent multiple pools during Next.js hot reloading
 const globalForPg = global as unknown as { pgPool: Pool | undefined };
 
+let connectionString = process.env.POSTGRES_URL;
+
+if (connectionString) {
+    try {
+        const url = new URL(connectionString);
+        url.searchParams.delete('sslmode');
+        connectionString = url.toString();
+    } catch (e) {
+        // Fallback if URL parsing fails
+        connectionString = connectionString
+            .replace(/sslmode=[^&]+/g, '')
+            .replace(/\?&/g, '?')
+            .replace(/&&/g, '&')
+            .replace(/[&?]$/g, '');
+    }
+}
+
 export const pool =
     globalForPg.pgPool ??
     new Pool({
-        connectionString: process.env.POSTGRES_URL,
+        connectionString,
         max: 20,                    // Up to 20 concurrent connections
         idleTimeoutMillis: 30_000,  // Close idle connections after 30s
         connectionTimeoutMillis: 5_000, // Error if no connection available in 5s
