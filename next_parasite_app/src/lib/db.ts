@@ -10,6 +10,9 @@ export const pool =
         max: 20,                    // Up to 20 concurrent connections
         idleTimeoutMillis: 30_000,  // Close idle connections after 30s
         connectionTimeoutMillis: 5_000, // Error if no connection available in 5s
+        ssl: {
+            rejectUnauthorized: false,
+        },
     });
 
 if (process.env.NODE_ENV !== 'production') {
